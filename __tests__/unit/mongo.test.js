@@ -5,6 +5,7 @@ const MongoDbCollectionDao = require("../../src/app/infra/mongodb/mongo-collecti
 const MongoDbConnection = require("../../src/config/databaseConnection/mongodb-connection-conf");
 
 const mock = require("./mock");
+
 const uuidModel = uuidv4();
 
 describe("Connection failure", () => {
