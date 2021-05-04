@@ -1,7 +1,11 @@
 require("../../src/config/env-config");
+const { v4: uuidv4 } = require("uuid");
 
 const MongoDbCollectionDao = require("../../src/app/infra/mongodb/mongo-collection-dao");
 const MongoDbConnection = require("../../src/config/databaseConnection/mongodb-connection-conf");
+
+const mock = require("./mock");
+const uuidModel = uuidv4();
 
 describe("Connection failure", () => {
   const oMongoConnection = {
@@ -27,13 +31,7 @@ describe("Connection failure", () => {
   });
 
   it("insert one connection error", async () => {
-    const jsonObject = {
-      name: "Equinix",
-      product: {
-        name: "Hyper-V",
-      },
-      vms: ["VM1", "VM2"],
-    };
+    const jsonObject = mock.user(uuidv4());
 
     const result = await mongoDao.insertOne(testCollection, jsonObject);
     expect(result.hasError).toBe(true);
@@ -41,27 +39,9 @@ describe("Connection failure", () => {
 
   it("insert many elements connection error", async () => {
     const array = [
-      {
-        name: "Equinix1",
-        product: {
-          name: "Hyper-V2",
-        },
-        vms: ["VM1", "VM2"],
-      },
-      {
-        name: "Equinix2",
-        product: {
-          name: "VMWare1",
-        },
-        vms: ["VM3", "VM4"],
-      },
-      {
-        name: "Equinix3",
-        product: {
-          name: "Hyper-V2",
-        },
-        vms: ["VM5", "VM6"],
-      },
+      mock.user(uuidv4()),
+      mock.user(uuidv4()),
+      mock.user(uuidv4()),
     ];
     const result = await mongoDao.insertMany(testCollection, array);
 
@@ -70,14 +50,13 @@ describe("Connection failure", () => {
 
   it("update existing data connection error", async () => {
     const jsonFilter = {
-      name: "Equinix",
+      uuid: uuidv4(),
     };
     const jsonObject = {
-      name: "Equinix",
-      product: {
-        name: "Hyper-V",
+      uuid: uuidv4(),
+      alarms: {
+        name: "PillHelper",
       },
-      vms: ["VM1", "VM2"],
     };
     const result = await mongoDao.update(
       testCollection,
@@ -106,7 +85,7 @@ describe("Validate Mongo Queries", () => {
   );
 
   const mongoDao = new MongoDbCollectionDao(oMongoConnection);
-  const testCollection = "jestTestCollection";
+  const testCollection = "user";
 
   beforeAll(async () => {
     await mongoDao.createCollection(testCollection);
@@ -125,13 +104,7 @@ describe("Validate Mongo Queries", () => {
   });
 
   it("insert one success", async () => {
-    const jsonObject = {
-      name: "Equinix",
-      product: {
-        name: "Hyper-V",
-      },
-      vms: ["VM1", "VM2"],
-    };
+    const jsonObject = mock.user(uuidModel);
 
     const result = await mongoDao.insertOne(testCollection, jsonObject);
 
@@ -147,27 +120,9 @@ describe("Validate Mongo Queries", () => {
 
   it("insert many elements success", async () => {
     const array = [
-      {
-        name: "Equinix1",
-        product: {
-          name: "Hyper-V2",
-        },
-        vms: ["VM1", "VM2"],
-      },
-      {
-        name: "Equinix2",
-        product: {
-          name: "VMWare1",
-        },
-        vms: ["VM3", "VM4"],
-      },
-      {
-        name: "Equinix3",
-        product: {
-          name: "Hyper-V2",
-        },
-        vms: ["VM5", "VM6"],
-      },
+      mock.user(uuidv4()),
+      mock.user(uuidv4()),
+      mock.user(uuidv4()),
     ];
     const result = await mongoDao.insertMany(testCollection, array);
 
@@ -184,14 +139,13 @@ describe("Validate Mongo Queries", () => {
 
   it("update existing data", async () => {
     const jsonFilter = {
-      name: "Equinix",
+      uuid: uuidModel,
     };
     const jsonObject = {
-      name: "Equinix",
-      product: {
-        name: "Hyper-V",
-      },
-      vms: ["VM1", "VM2"],
+      uuid: uuidModel,
+      alarms: [],
+      box: [{}],
+      login: {},
     };
     const result = await mongoDao.update(
       testCollection,
@@ -210,10 +164,10 @@ describe("Validate Mongo Queries", () => {
 
   it("update push", async () => {
     const jsonFilter = {
-      name: "Equinix",
+      uuid: uuidModel,
     };
     const jsonObject = {
-      vms: ["VM3", "VM4"],
+      alarms: [{ teste: "teste" }],
     };
     const result = await mongoDao.updatePush(
       testCollection,
