@@ -1,3 +1,3 @@
-# SDK-PillHelper
+# Pill Helper SDK
 
-Develop
+The project created for auxilian Pill Helper API in execute mongodb
