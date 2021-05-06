@@ -163,6 +163,21 @@ class MongoDbCollectionDao {
     return queryResult;
   }
 
+  async remove(pCollection, jsonFilter) {
+    const queryResult = new QueryResult();
+    try {
+      const db = await mongo.getDB(this.db, this.mongoUri);
+      queryResult.result = await db
+        .collection(pCollection)
+        .remove(jsonFilter)
+        .toArray();
+    } catch (error) {
+      queryResult.hasError = true;
+      queryResult.msgError = error.message;
+    }
+    return queryResult;
+  }
+
   async closeConnection() {
     const queryResult = new QueryResult();
 
