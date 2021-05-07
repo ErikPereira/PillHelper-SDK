@@ -163,14 +163,13 @@ class MongoDbCollectionDao {
     return queryResult;
   }
 
-  async remove(pCollection, jsonFilter) {
+  async deleteOne(pCollection, jsonObject) {
     const queryResult = new QueryResult();
     try {
       const db = await mongo.getDB(this.db, this.mongoUri);
-      queryResult.result = await db
-        .collection(pCollection)
-        .remove(jsonFilter)
-        .toArray();
+      const result = await db.collection(pCollection).deleteOne(jsonObject);
+      // eslint-disable-next-line no-underscore-dangle
+      queryResult.result = result.deletedCount;
     } catch (error) {
       queryResult.hasError = true;
       queryResult.msgError = error.message;
